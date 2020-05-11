@@ -1,5 +1,10 @@
 const conexion = require('../lib/conexionbd');
 
+var response ={
+    peliculas:'',
+    generos:'',
+}
+
 function buscarGeneros(req, res) {
     const sql = "select * from genero"
 
@@ -8,13 +13,11 @@ function buscarGeneros(req, res) {
             console.log("Hubo un error en la consulta", error.message);
             return res.status(404).send("Hubo un error en la consulta");
         }
-        const response = {
-            'generos': resultado
-        };
-    
+        response.generos = resultado;
         res.send(JSON.stringify(response));
     });
 }
+
 
 module.exports = {
     buscarGeneros : buscarGeneros
