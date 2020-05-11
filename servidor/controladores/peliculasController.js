@@ -106,52 +106,62 @@ function detallesPelicula(req,res){
         console.log(detalles);
         res.send(JSON.stringify(detalles));
     })
-    }    
+    }   
 
-function recomendarPelicula(req, res){
-
-    var genero = req.query.genero
-    var puntuacion = req.query.puntuacion
-    var anio_inicio = req.query.anio_inicio
-    var anio_fin = req.query.anio_fin
+    function recomendarPeliculas(req, res) {
+        const genero = req.query.genero, 
+              anio_inicio = req.query.anio_inicio, 
+              anio_fin = req.query.anio_fin, 
+              puntuacion = req.query.puntuacion
     
-    var sqlAnio = "(anio BETWEEN " + anio_inicio + " AND " + anio_fin + ")"
-    var sqlPuntuacion = "puntuacion >= " + puntuacion
-    var sqlGenero = "genero.nombre = '" + genero + "'"
+        let sql = "SELECT * FROM pelicula INNER JOIN genero ON pelicula.genero_id = genero.id", 
+            where = "";        
     
-    var sqlWhere = (function(){
-            if(genero && puntuacion && !anio_inicio){
-                return "WHERE " + sqlGenero + " AND " + sqlPuntuacion
-            } else if (genero && !puntuacion && anio_inicio){
-                return "WHERE " + sqlGenero + " AND " + sqlAnio
-            } else if (genero && !puntuacion && !anio_inicio) {
-                return "WHERE " + sqlGenero
-            } else if(!genero && puntuacion && !anio_inicio) {
-                return "WHERE " + sqlPuntuacion
-            } else if(!genero && !puntuacion && anio_inicio){
-                return "WHERE " + sqlAnio
-            } else if(!genero && !puntuacion && !anio_inicio){
-                return ""
-            }
-        })()
-    
-    var sqlRecomendacion = 
-        `SELECT *, genero.nombre
-        FROM pelicula
-        LEFT JOIN genero on genero.id = pelicula.genero_id ` + sqlWhere
-
-    conexion.query(sqlRecomendacion, function(error, resultado, fields){
-        if(error){
-             console.log("Hubo un error en la consulta", error.message)
-            return res.status(404).send("Hubo un error en la consulta")
+        if (genero){
+            where = where + "genero.nombre = '" + genero + "'";
         }
-            var response = {
-                'peliculas': resultado
-            }           
-            res.send(JSON.stringify(response))      
-        })
     
-}
+        if (anio_inicio){
+            if (genero){
+                where = where + " AND ";
+            }
+            
+            where = where + "anio >= " + anio_inicio;
+        }
+    
+        if (anio_fin){
+            if (genero || anio_inicio){
+                where = where + " AND ";
+            }
+            
+            where = where + "anio <= " + anio_fin;
+        }
+    
+        if (puntuacion){
+            if (genero || anio_inicio || anio_fin){
+                where = where + " AND ";
+            }
+            
+            where = where + "puntuacion = " + puntuacion;
+        }
+    
+        if (where){
+            sql = sql + " WHERE " + where;
+        }
+    
+        conexion.query(sql, function(error, resultado, fields) {
+            if (error) {
+                console.log("Hubo un error en la consulta", error.message);
+                return res.status(404).send("Hubo un error en la consulta");
+            }
+    
+            const response = {
+                'peliculas': resultado
+                };
+    
+            res.send(JSON.stringify(response));    
+        });
+    };
   
 
  
@@ -159,5 +169,5 @@ function recomendarPelicula(req, res){
 module.exports = {
    buscarPeliculas : buscarPeliculas,
    detallesPelicula: detallesPelicula,
-   recomendarPelicula : recomendarPelicula
+   recomendarPeliculas : recomendarPeliculas
 };

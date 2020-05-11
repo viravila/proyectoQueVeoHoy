@@ -13,8 +13,7 @@ CREATE TABLE pelicula (
     puntuacion tinyint,
     poster varchar(300),
     trama varchar(700),
-    genero_id int,
-    PRIMARY KEY (id),
+    PRIMARY KEY (id)
     );
 
 CREATE TABLE genero (
@@ -37,7 +36,7 @@ CREATE TABLE actor_pelicula (
     id Int Not Null auto_increment,
     actor_id int,
     pelicula_id int,
-    PRIMARY KEY (id),
+    PRIMARY KEY (id)
     );
     
 ALTER TABLE actor_pelicula  ADD FOREIGN KEY (actor_id) REFERENCES actor (id);
