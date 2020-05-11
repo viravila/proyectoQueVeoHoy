@@ -114,7 +114,7 @@ function detallesPelicula(req,res){
               anio_fin = req.query.anio_fin, 
               puntuacion = req.query.puntuacion
     
-        let sql = "SELECT * FROM pelicula INNER JOIN genero ON pelicula.genero_id = genero.id", 
+        let sql = "SELECT pelicula.*, genero.nombre FROM pelicula INNER JOIN genero ON pelicula.genero_id = genero.id", 
             where = "";        
     
         if (genero){
@@ -163,7 +163,6 @@ function detallesPelicula(req,res){
         });
     };
   
-
  
 
 module.exports = {
